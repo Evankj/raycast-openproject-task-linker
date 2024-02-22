@@ -1,0 +1,60 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "openproject-task-linker",
+  "title": "OpenProject Task Linker",
+  "description": "Easily find and insert a link to the OpenProject work package you're looking for.",
+  "icon": "command-icon.png",
+  "author": "evankj",
+  "categories": [
+    "Productivity"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "index",
+      "title": "Search OpenProject Work Packages",
+      "description": "Easily find and insert a link to the OpenProject work package you're looking for.",
+      "mode": "view"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.68.0",
+    "@raycast/utils": "^1.4.8",
+    "op-client": "^1.4.2"
+  },
+  "preferences": [
+    {
+      "name": "openProjectUrl",
+      "type": "textfield",
+      "title": "OpenProject URL",
+      "key": "openProjectUrl",
+      "placeholder": "https://your-openproject-domain",
+      "required": true,
+      "description": "The URL for your OpenProject instance"
+    },
+    {
+      "name": "apiKey",
+      "type": "password",
+      "title": "API Key",
+      "key": "apiKey",
+      "placeholder": "Your personal API key",
+      "required": true,
+      "description": "The API key for your OpenProject instance"
+    }
+  ],
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.27",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
