@@ -44,6 +44,8 @@ export default function Command() {
     >
       {data &&
         data._embedded.elements.map((workPackage) => {
+
+          const workPackageUrl = `${openProjectUrl}/work_packages/${workPackage.id}`;
           console.log(workPackage.subject);
           return (
             <List.Item
@@ -51,8 +53,21 @@ export default function Command() {
               actions={
                 <ActionPanel>
                   <Action.Paste
-                    content={`[OP#${workPackage.id}](${openProjectUrl}/work_packages/${workPackage.id})`}
+                    title="Paste markdown link"
+                    content={`[OP#${workPackage.id}](${workPackageUrl})`}
                   ></Action.Paste>
+                  <Action.Paste
+                    title="Paste markdown link with subject"
+                    content={`[OP#${workPackage.id} - ${workPackage.subject}](${workPackageUrl})`}
+                  ></Action.Paste>
+                  <Action.CopyToClipboard
+                    content={workPackageUrl}
+                    title="Copy URL to Clipboard"
+                  />
+                  <Action.OpenInBrowser
+                    url={workPackageUrl}
+                    title="Open in Browser"
+                  />
                 </ActionPanel>
               }
             />
