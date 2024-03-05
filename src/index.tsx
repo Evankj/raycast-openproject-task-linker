@@ -44,12 +44,21 @@ export default function Command() {
     >
       {data &&
         data._embedded.elements.map((workPackage) => {
-
           const workPackageUrl = `${openProjectUrl}/work_packages/${workPackage.id}`;
-          console.log(workPackage.subject);
+          // HACK: OP client library with WP type is outdated but I don't have time to make my own types for this currently
+          // @ts-ignore
+          const wp_data = workPackage._links as {
+            assignee?: {
+              href: string | undefined;
+              title?: string;
+            };
+          };
+
           return (
             <List.Item
+              key={workPackage.id}
               title={`OP#${workPackage.id} - ${workPackage.subject}`}
+              subtitle={wp_data.assignee?.title}
               actions={
                 <ActionPanel>
                   <Action.Paste
@@ -60,14 +69,8 @@ export default function Command() {
                     title="Paste markdown link with subject"
                     content={`[OP#${workPackage.id} - ${workPackage.subject}](${workPackageUrl})`}
                   ></Action.Paste>
-                  <Action.CopyToClipboard
-                    content={workPackageUrl}
-                    title="Copy URL to Clipboard"
-                  />
-                  <Action.OpenInBrowser
-                    url={workPackageUrl}
-                    title="Open in Browser"
-                  />
+                  <Action.CopyToClipboard content={workPackageUrl} title="Copy URL to Clipboard" />
+                  <Action.OpenInBrowser url={workPackageUrl} title="Open in Browser" />
                 </ActionPanel>
               }
             />
