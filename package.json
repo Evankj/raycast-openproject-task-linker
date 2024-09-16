@@ -12,9 +12,15 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "index",
+      "name": "search",
       "title": "Search OpenProject Work Packages",
       "description": "Easily find and insert a link to the OpenProject work package you're looking for.",
+      "mode": "view"
+    },
+    {
+      "name": "create",
+      "title": "Create OpenProject Work Package",
+      "description": "Easily create a Work Package via a form.",
       "mode": "view"
     }
   ],

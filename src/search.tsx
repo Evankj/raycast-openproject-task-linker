@@ -1,17 +1,10 @@
-import { List, ActionPanel, Action, Icon, Color, showHUD } from "@raycast/api";
+import { List, ActionPanel, Action, Icon, showHUD } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 import { useState } from "react";
 import { getPreferences } from "./preferences";
 import { WP } from "op-client";
+import { DEFAULT_STATUS_COLOUR, statusColourLUT } from "./types";
 
-const statusColourLUT: Map<string, Color> = new Map(
-  Object.entries({
-    BLOCKED: Color.Red,
-    "On hold": Color.Orange,
-  }),
-);
-
-const defaultStatusColour = Color.SecondaryText;
 
 export default function Command() {
   const { openProjectUrl, apiKey } = getPreferences();
@@ -23,7 +16,7 @@ export default function Command() {
       return new URL(`${openProjectUrl}/api/v3/work_packages`);
     }
     const search = JSON.stringify([
-      { subject: { operator: "~", values: [encodeURIComponent(text)] } },
+      { subjectOrId: { operator: "**", values: [encodeURIComponent(text)] } },
     ]);
     const url = new URL(`${openProjectUrl}/api/v3/work_packages?filters=${search}`);
 
@@ -41,6 +34,7 @@ export default function Command() {
     keepalive: true,
   });
 
+
   return (
     <List
       isLoading={isLoading}
@@ -51,13 +45,14 @@ export default function Command() {
       }}
       filtering={true}
     >
+      <List.EmptyView
+        icon={{ source: "icon.png" }}
+        title="No work packages found"
+      />
       {data &&
         data._embedded.elements.map((workPackage) => {
           const workPackageUrl = `${openProjectUrl}/work_packages/${workPackage.id}`;
-          // HACK: OP client library with WP type is outdated but I don't have time to make my own types for this currently
-
-          // @ts-ignore
-          const wp_data = workPackage._links as {
+          const wp_links = workPackage._links as {
             assignee?: {
               href: string | undefined;
               title?: string;
@@ -67,7 +62,7 @@ export default function Command() {
             };
           };
 
-          const status = wp_data.status?.title || "";
+          const status = wp_links.status?.title || "";
 
           return (
             <List.Item
@@ -76,14 +71,14 @@ export default function Command() {
               accessories={[
                 {
                   text: {
-                    value: wp_data.assignee?.title,
+                    value: wp_links.assignee?.title,
                   },
-                  icon: wp_data.assignee?.title ? Icon.Person : undefined,
+                  icon: wp_links.assignee?.title ? Icon.Person : undefined,
                 },
                 {
                   text: {
-                    value: wp_data.status?.title,
-                    color: statusColourLUT.get(status) || defaultStatusColour,
+                    value: wp_links.status?.title,
+                    color: statusColourLUT.get(status) || DEFAULT_STATUS_COLOUR,
                   },
                   icon: Icon.Info,
                 },
@@ -93,12 +88,12 @@ export default function Command() {
                   <Action.Paste
                     title="Paste markdown link"
                     content={`[OP#${workPackage.id}](${workPackageUrl})`}
-                  ></Action.Paste>
+                  />
                   <Action.Paste
                     title="Paste markdown link with subject"
                     content={`[OP#${workPackage.id} - ${workPackage.subject}](${workPackageUrl})`}
-                  ></Action.Paste>
-                  <Action.CopyToClipboard content={workPackageUrl} title="Copy URL to Clipboard" onCopy={(_) => showHUD("Copied to clipboard")}/>
+                  />
+                  <Action.CopyToClipboard content={workPackageUrl} title="Copy URL to Clipboard" onCopy={(_) => showHUD("Copied to clipboard")} />
                   <Action.OpenInBrowser url={workPackageUrl} title="Open in Browser" />
                 </ActionPanel>
               }
@@ -108,3 +103,4 @@ export default function Command() {
     </List>
   );
 }
+
